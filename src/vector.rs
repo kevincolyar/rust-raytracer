@@ -1,14 +1,20 @@
-pub mod vector;
-
 pub struct Vector {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vector {
-    pub fn subtract(&self, v: Vector) -> Vector {
+    pub fn subtract(&self, v: &Vector) -> Vector {
         Vector { x: self.x - v.x, y: self.y - v.y, z: self.z - v.z }
+    }
+
+    pub fn add(&self, v: &Vector) -> Vector {
+        Vector { x: self.x + v.x, y: self.y + v.y, z: self.z + v.z }
+    }
+
+    pub fn multiply(&self, s: f64) -> Vector {
+        Vector { x: self.x * s, y: self.y * s, z: self.z * s }
     }
 
     pub fn normalized(&self) -> Vector {
