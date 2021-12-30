@@ -19,7 +19,6 @@ impl Sphere {
             return Intersection { t: t, success: false }
         }
 
-
         let t0 = b - d.sqrt();
         let t1 = b + d.sqrt();
         let mut t = t;

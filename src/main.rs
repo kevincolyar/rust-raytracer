@@ -20,15 +20,28 @@ use crate::scene::Scene;
 use crate::ray_tracer::render;
 
 fn main() {
-    let white = Color { r: 1.0, g: 1.0, b: 1.0 };
-    let purple = Color { r: 1.0, g: 0.0, b: 1.0 };
 
     // Create objects
     let objects = vec![
         Sphere {
-            position: Vector { x: 100.0, y: 10.0, z: 0.0 },
+            position: Vector { x: 100.0, y: 100.0, z: 0.0 },
             radius: 100.0,
-            material: Material { diffuse: purple, reflection: 0.5, _specular: white, power: 60.0 }
+            material: Material { diffuse: Color { r: 1.0, g: 0.0, b: 1.0 }, reflection: 0.5, power: 60.0 }
+        },
+        Sphere {
+            position: Vector { x: -100.0, y: 100.0, z: 0.0 },
+            radius: 100.0,
+            material: Material { diffuse: Color { r: 0.0, g: 0.0, b: 1.0 }, reflection: 0.5, power: 60.0 }
+        },
+        Sphere {
+            position: Vector { x: -100.0, y: -100.0, z: 0.0 },
+            radius: 100.0,
+            material: Material { diffuse: Color { r: 1.0, g: 1.0, b: 1.0 }, reflection: 0.8, power: 60.0 }
+        },
+        Sphere {
+            position: Vector { x: 100.0, y: -100.0, z: 0.0 },
+            radius: 100.0,
+            material: Material { diffuse: Color { r: 0.0, g: 1.0, b: 0.0 }, reflection: 0.2, power: 60.0 }
         },
     ];
 

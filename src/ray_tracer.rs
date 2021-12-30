@@ -6,7 +6,6 @@ use crate::material::Material;
 use crate::light::Light;
 use crate::scene::Scene;
 use crate::ray::Ray;
-use crate::intersection::Intersection;
 
 pub fn render(scene: &Scene, img: &mut RgbImage){
     let width = img.width();
@@ -24,23 +23,24 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
 
             loop {
                 let mut t = 20000.0;
+                let mut intersection = None;
+                let mut current_sphere = None;
 
-                let intersections: Vec<Intersection> = scene.objects
-                                                            .iter()
-                                                            .map(|sphere| sphere.intersection(&ray, t))
-                                                            .filter(|intersection| intersection.success).collect();
-
-                if intersections.len() < 1 {
-                    break;
+                for sphere in scene.objects.iter() {
+                    let i = sphere.intersection(&ray, t);
+                    if i.success {
+                        intersection = Some(i);
+                        current_sphere = Some(sphere);
+                        break;
+                    }
                 }
 
-                let intersection = &intersections[0];
-                let current_sphere = &scene.objects[0]; // TODO: Needs to match up with intersection
+                if intersection.is_none() { break }
 
-                t = intersection.t;
+                t = intersection.unwrap().t;
 
                 let intersection_position = ray.position.add(&ray.direction.multiply(t));
-                let mut intersection_normal = intersection_position.subtract(&current_sphere.position);
+                let mut intersection_normal = intersection_position.subtract(&current_sphere.unwrap().position);
 
                 let temp = intersection_normal.dot(&intersection_normal);
                 if temp == 0.0 { break; }
@@ -75,12 +75,12 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                     //   }
 
                     if in_shadow == false {
-                        lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.material, coef);
-                        phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.material, coef);
+                        lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
+                        phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
                     }
                }
 
-                coef = coef * current_sphere.material.reflection;
+                coef = coef * current_sphere.unwrap().material.reflection;
                 let reflection = 2.0 * ray.direction.dot(&intersection_normal);
 
                 ray.position = intersection_position;
