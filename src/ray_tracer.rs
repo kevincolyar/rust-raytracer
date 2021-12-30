@@ -19,7 +19,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
             let mut pixel = Color { r: 0.0, g: 0.0, b: 0.0 };
             let mut ray = Ray {
                 position: Vector { x: scene.eye.x, y: scene.eye.y, z: scene.eye.z},
-                direction: Vector { x: x as f64 - (width as f64 / 2.0), y: (height as f64 / 2.0) - y as f64, z: 0.0 }.subtract(&scene.eye).normalized()
+                direction: Vector { x: x as f64 - (width as f64 / 2.0), y: (height as f64 / 2.0) - y as f64, z: scene.plane }.subtract(&scene.eye).normalized()
             };
 
             loop {

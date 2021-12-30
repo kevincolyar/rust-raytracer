@@ -6,5 +6,5 @@ pub struct Scene {
     pub objects: Vec<Sphere>,
     pub lights: Vec<Light>,
     pub eye: Vector,
-    pub _plane: f64,
+    pub plane: f64,
 }

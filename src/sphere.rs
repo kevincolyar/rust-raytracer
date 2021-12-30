@@ -35,6 +35,7 @@ impl Sphere {
             success = true;
         }
 
+        // println!("{}, {}, {}", t, t0, t1);
         Intersection { t: t, success: success }
     }
 }

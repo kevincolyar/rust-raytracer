@@ -26,7 +26,7 @@ fn main() {
     // Create objects
     let objects = vec![
         Sphere {
-            position: Vector { x: 100.0, y: 100.0, z: 0.0 },
+            position: Vector { x: 100.0, y: 10.0, z: 0.0 },
             radius: 100.0,
             material: Material { diffuse: purple, reflection: 0.5, _specular: white, power: 60.0 }
         },
@@ -51,7 +51,7 @@ fn main() {
     let plane = 100.0;
 
     // Create scene
-    let scene = Scene { objects: objects, lights: lights, eye: eye, _plane: plane };
+    let scene = Scene { objects: objects, lights: lights, eye: eye, plane: plane };
 
     // Create image
     let mut img: RgbImage = ImageBuffer::new(500, 500);

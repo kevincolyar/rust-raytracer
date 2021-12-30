@@ -18,7 +18,7 @@ impl Vector {
     }
 
     pub fn normalized(&self) -> Vector {
-        let m = (self.x * self.x + self.y * self.y + self.z + self.z).sqrt();
+        let m = (self.x * self.x + self.y * self.y + self.z * self.z).sqrt();
 
         Vector { x: self.x / m, y: self.y / m, z: self.z / m }
     }
