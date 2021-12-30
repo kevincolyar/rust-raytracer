@@ -43,7 +43,7 @@ fn main() {
             position: Vector { x: 100.0, y: -100.0, z: 0.0 },
             radius: 100.0,
             material: Material { diffuse: Color { r: 0.0, g: 1.0, b: 0.0 }, reflection: 0.2, power: 60.0 }
-        },
+        }
     ];
 
     // Create lights
