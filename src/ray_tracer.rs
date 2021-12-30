@@ -2,10 +2,11 @@ use image::{RgbImage, Rgb};
 
 use crate::vector::Vector;
 use crate::color::Color;
-use crate::material::Material;
-use crate::light::Light;
 use crate::scene::Scene;
 use crate::ray::Ray;
+
+use crate::shaders::lambert;
+use crate::shaders::phong;
 
 pub fn render(scene: &Scene, img: &mut RgbImage){
     let width = img.width();
@@ -43,7 +44,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                 let mut intersection_normal = intersection_position.subtract(&current_sphere.unwrap().position);
 
                 let temp = intersection_normal.dot(&intersection_normal);
-                if temp == 0.0 { break; }
+                if temp == 0.0 { break }
 
                 let temp = 1.0 / temp.sqrt();
                 intersection_normal = intersection_normal.multiply(temp);
@@ -60,19 +61,19 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                         direction: dist.multiply(1.0/t)
                     };
 
-                    let in_shadow = false;
+                    let mut in_shadow = false;
 
                     // Detect Shadows
-                    // for sphere in &scene.objects {
-                    //     let intersection = current_sphere.intersection(&light_ray, t);
+                    for sphere in &scene.objects {
+                        let intersection = sphere.intersection(&light_ray, t);
 
-                    //     if intersection.success {
-                    //         in_shadow = true;
-                    //         t = intersection.t;
-                    //     }
+                        if intersection.success {
+                            in_shadow = true;
+                            t = intersection.t;
+                        }
 
-                    //     if in_shadow { break }
-                    //   }
+                        if in_shadow { break }
+                      }
 
                     if in_shadow == false {
                         lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
@@ -96,22 +97,4 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
             img.put_pixel(x as u32, y as u32, Rgb([(pixel.r * 255.0) as u8, (pixel.g * 255.0) as u8, (pixel.b * 255.0) as u8]));
         }
     }
-}
-
-fn lambert(pixel: &mut Color, _ray: &Ray, light_ray: &Ray, light: &Light, intersection_normal: &Vector, material: &Material, coef: f64){
-    let lambert = light_ray.direction.dot(intersection_normal) * coef;
-    pixel.r = pixel.r + lambert * light.color.r * material.diffuse.r;
-    pixel.g = pixel.g + lambert * light.color.g * material.diffuse.g;
-    pixel.b = pixel.b + lambert * light.color.b * material.diffuse.b;
-}
-
-fn phong(pixel: &mut Color, ray: &Ray, light_ray: &Ray, light: &Light, intersection_normal: &Vector, material: &Material, coef: f64){
-    let reflet = 2.0 * light_ray.direction.dot(intersection_normal);
-    let phong_direction = light_ray.direction.subtract(&intersection_normal.multiply(reflet));
-    let phong_term = phong_direction.dot(&ray.direction).max(0.0);
-    let phong_term = 1.0 * phong_term.powf(material.power) * coef;
-
-    pixel.r = pixel.r + phong_term * light.color.r;
-    pixel.g = pixel.g + phong_term * light.color.g;
-    pixel.b = pixel.b + phong_term * light.color.b;
 }

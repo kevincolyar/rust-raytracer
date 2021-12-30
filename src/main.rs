@@ -10,6 +10,7 @@ pub mod intersection;
 pub mod scene;
 pub mod ray;
 pub mod ray_tracer;
+pub mod shaders;
 
 use crate::vector::Vector;
 use crate::sphere::Sphere;
@@ -53,7 +54,7 @@ fn main() {
         },
         Light {
             position: Vector { x: -500.0, y: 500.0, z: 500.0 },
-            color: Color { r: 0.0, g: 1.0, b: 0.0 }
+            color: Color { r: 0.0, g: 1.0, b: 1.0 }
         }
     ];
 
