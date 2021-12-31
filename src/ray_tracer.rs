@@ -51,7 +51,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                 let temp = 1.0 / temp.sqrt();
                 intersection_normal = intersection_normal.multiply(temp);
 
-                for light in &scene.lights {
+                'lights: for light in &scene.lights {
                     let dist = light.position.subtract(&intersection_position);
                     if intersection_normal.dot(&dist) <= 0.0 { continue }
 
@@ -63,24 +63,17 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                         direction: dist.multiply(1.0/t)
                     };
 
-                    let mut in_shadow = false;
-
                     // Detect Shadows
                     for sphere in &scene.objects {
                         let intersection = sphere.intersection(&light_ray, t);
 
                         if intersection.success {
-                            in_shadow = true;
-                            t = intersection.t;
+                            break 'lights;
                         }
-
-                        if in_shadow { break }
-                      }
-
-                    if in_shadow == false {
-                        lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
-                        phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
                     }
+
+                    lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
+                    phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
                }
 
                 // Reflections
