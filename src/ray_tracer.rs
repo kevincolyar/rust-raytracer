@@ -23,10 +23,12 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
             };
 
             loop {
-                let mut t = 20000.0;
+                let mut t = 20000.0; // TODO: Magic number
+
                 let mut intersection = None;
                 let mut current_sphere = None;
 
+                // TODO: This should find the closest intersection (smallest t), not the first.
                 for sphere in scene.objects.iter() {
                     let i = sphere.intersection(&ray, t);
                     if i.success {
@@ -81,6 +83,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                     }
                }
 
+                // Reflections
                 coef = coef * current_sphere.unwrap().material.reflection;
                 let reflection = 2.0 * ray.direction.dot(&intersection_normal);
 
@@ -89,7 +92,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
 
                 level = level + 1;
 
-                if (coef <= 0.0) || (level >= 10) {
+                if (coef <= 0.0) || (level >= 10) { // TODO: Magic number
                     break
                 }
             }
