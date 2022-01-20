@@ -24,18 +24,17 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
 
             loop {
                 let mut t = 20000.0; // TODO: Magic number
+                let mut smallest_t = f64::MAX;
 
                 let mut intersection = None;
                 let mut current_obj = None;
 
-                // TODO: This should find the closest intersection (smallest t),
-                // not the first.
                 for obj in scene.objects.iter() {
                     let i = obj.intersection(&ray, t);
-                    if i.success {
+                    if i.success && (i.t < smallest_t) {
+                        smallest_t = i.t;
                         intersection = Some(i);
                         current_obj = Some(obj);
-                        break;
                     }
                 }
 
