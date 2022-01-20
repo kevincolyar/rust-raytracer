@@ -26,14 +26,15 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                 let mut t = 20000.0; // TODO: Magic number
 
                 let mut intersection = None;
-                let mut current_sphere = None;
+                let mut current_obj = None;
 
-                // TODO: This should find the closest intersection (smallest t), not the first.
-                for sphere in scene.objects.iter() {
-                    let i = sphere.intersection(&ray, t);
+                // TODO: This should find the closest intersection (smallest t),
+                // not the first.
+                for obj in scene.objects.iter() {
+                    let i = obj.intersection(&ray, t);
                     if i.success {
                         intersection = Some(i);
-                        current_sphere = Some(sphere);
+                        current_obj = Some(obj);
                         break;
                     }
                 }
@@ -43,7 +44,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                 t = intersection.unwrap().t;
 
                 let intersection_position = ray.position.add(&ray.direction.multiply(t));
-                let mut intersection_normal = intersection_position.subtract(&current_sphere.unwrap().position);
+                let mut intersection_normal = intersection_position.subtract(&current_obj.unwrap().position);
 
                 let temp = intersection_normal.dot(&intersection_normal);
                 if temp == 0.0 { break }
@@ -64,20 +65,20 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                     };
 
                     // Detect Shadows
-                    for sphere in &scene.objects {
-                        let intersection = sphere.intersection(&light_ray, t);
+                    // for obj in &scene.objects {
+                    //     let intersection = obj.intersection(&light_ray, t);
 
-                        if intersection.success {
-                            break 'lights;
-                        }
-                    }
+                    //     if intersection.success {
+                    //         break 'lights;
+                    //     }
+                    // }
 
-                    lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
-                    phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_sphere.unwrap().material, coef);
+                    lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_obj.unwrap().material, coef);
+                    phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_obj.unwrap().material, coef);
                }
 
                 // Reflections
-                coef = coef * current_sphere.unwrap().material.reflection;
+                coef = coef * current_obj.unwrap().material.reflection;
                 let reflection = 2.0 * ray.direction.dot(&intersection_normal);
 
                 ray.position = intersection_position;

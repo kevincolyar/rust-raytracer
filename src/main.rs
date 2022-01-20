@@ -2,7 +2,6 @@ use image::{RgbImage, ImageBuffer};
 
 // Define modules in our crate
 pub mod vector;
-pub mod sphere;
 pub mod color;
 pub mod light;
 pub mod material;
@@ -11,39 +10,71 @@ pub mod scene;
 pub mod ray;
 pub mod ray_tracer;
 pub mod shaders;
+pub mod object;
 
 use crate::vector::Vector;
-use crate::sphere::Sphere;
 use crate::color::Color;
 use crate::material::Material;
 use crate::light::Light;
 use crate::scene::Scene;
+use crate::object::{Object,ObjectType};
 use crate::ray_tracer::render;
 
 fn main() {
 
     // Create objects
-    let objects = vec![
-        Sphere {
+    let objects: Vec<Object> = vec![
+        Object {
+            object_type: ObjectType::Sphere,
             position: Vector { x: 100.0, y: 100.0, z: 0.0 },
             radius: 100.0,
+            normal: Vector::default(), // TODO: Not needed for Sphere
             material: Material { diffuse: Color { r: 1.0, g: 0.0, b: 1.0 }, reflection: 0.5, power: 60.0 }
         },
-        Sphere {
+        Object {
+            object_type: ObjectType::Sphere,
             position: Vector { x: -100.0, y: 100.0, z: 0.0 },
             radius: 100.0,
+            normal: Vector::default(), // TODO: Not needed for Sphere
             material: Material { diffuse: Color { r: 0.0, g: 0.0, b: 1.0 }, reflection: 0.5, power: 60.0 }
         },
-        Sphere {
+        Object {
+            object_type: ObjectType::Sphere,
             position: Vector { x: -100.0, y: -100.0, z: 0.0 },
             radius: 100.0,
+            normal: Vector::default(), // TODO: Not needed for Sphere
             material: Material { diffuse: Color { r: 1.0, g: 1.0, b: 1.0 }, reflection: 0.8, power: 60.0 }
         },
-        Sphere {
+        Object {
+            object_type: ObjectType::Sphere,
             position: Vector { x: 100.0, y: -100.0, z: 0.0 },
             radius: 100.0,
+            normal: Vector::default(), // TODO: Not needed for Sphere
             material: Material { diffuse: Color { r: 0.0, g: 1.0, b: 0.0 }, reflection: 0.2, power: 60.0 }
+        },
+        Object {
+            object_type: ObjectType::Plane,
+            position: Vector { x: 0.0, y: -200.0, z: 0.0 },
+            radius: 0.0, // TODO: Not needed for Plane
+            normal: Vector { x: 0.0, y: 1.0, z: 0.0 },
+            material: Material { diffuse: Color { r: 0.5, g: 0.0, b: 0.5 }, reflection: 0.5, power: 60.0 }
+        },
+        Object {
+            object_type: ObjectType::Plane,
+            position: Vector { x: 0.0, y: 200.0, z: 0.0 },
+            radius: 0.0, // TODO: Not needed for Plane
+            normal: Vector { x: 0.0, y: -1.0, z: 0.0 },
+            material: Material { diffuse: Color { r: 0.5, g: 0.9, b: 0.5 }, reflection: 0.3, power: 60.0 }
+        },
+
+        Object {
+            object_type: ObjectType::Sphere,
+            position: Vector { x: -120.0, y: 0.0, z: 0.0 },
+            radius: 100.0, // TODO: Not needed for Plane
+            normal: Vector { x: 1.0, y: 0.0, z: 0.0 },
+            material: Material { diffuse: Color { r: 1.0, g: 0.0, b: 0.0 }, reflection: 0.3, power: 60.0 }
         }
+
     ];
 
     // Create lights
