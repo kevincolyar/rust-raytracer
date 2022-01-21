@@ -25,16 +25,18 @@ impl Object {
     }
 
     fn intersection_plane(&self, ray: &Ray, t: f64) -> Intersection {
-        let denom = self.normal.dot(&ray.direction);
+        // let denom = self.normal.dot(&ray.direction);
+        let denom = ray.direction.dot(&self.normal);
 
-        if denom.abs() > 0.0 {
+        if denom.abs() > 0.000001 {
             let tmp_t = self.position.subtract(&ray.position).dot(&self.normal) / denom;
-            if tmp_t >= -0.00000001 {
-                return Intersection { t: tmp_t, success: true }
+            if tmp_t >= 0.0000001 {
+                let position = ray.position.add(&ray.direction.multiply(tmp_t));
+                return Intersection { t: tmp_t, success: true, normal: self.normal.clone(), position: position }
             }
         }
 
-        Intersection { t: t, success: false }
+        Intersection { t: t, success: false, normal: Vector::default(), position: Vector::default() }
     }
 
     fn intersection_sphere(&self, ray: &Ray, t: f64) -> Intersection {
@@ -43,7 +45,7 @@ impl Object {
         let d = b * b - dist.dot(&dist) + self.radius * self.radius;
 
         if d < 0.0 {
-            return Intersection { t: t, success: false }
+            return Intersection { t: t, success: false, normal: Vector::default(), position: Vector::default() }
         }
 
         let t0 = b - d.sqrt();
@@ -61,6 +63,10 @@ impl Object {
             success = true;
         }
 
-        Intersection { t: t, success: success }
+
+        let position = ray.position.add(&ray.direction.normalized().multiply(t));
+        let normal = position.subtract(&self.position).normalized();
+
+        Intersection { t: t, success: success, normal: normal, position: position  }
     }
 }

@@ -26,41 +26,38 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                 let mut t = 20000.0; // TODO: Magic number
                 let mut smallest_t = f64::MAX;
 
-                let mut intersection = None;
+                let mut current_intersection = None;
                 let mut current_obj = None;
 
                 for obj in scene.objects.iter() {
                     let i = obj.intersection(&ray, t);
                     if i.success && (i.t < smallest_t) {
                         smallest_t = i.t;
-                        intersection = Some(i);
+                        current_intersection = Some(i);
                         current_obj = Some(obj);
                     }
                 }
 
-                if intersection.is_none() { break }
+                if current_intersection.is_none() { break }
 
-                t = intersection.unwrap().t;
+                let intersection = current_intersection.unwrap();
 
-                let intersection_position = ray.position.add(&ray.direction.multiply(t));
-                let mut intersection_normal = intersection_position.subtract(&current_obj.unwrap().position);
-
-                let temp = intersection_normal.dot(&intersection_normal);
+                let temp = intersection.normal.dot(&intersection.normal);
                 if temp == 0.0 { break }
 
                 let temp = 1.0 / temp.sqrt();
-                intersection_normal = intersection_normal.multiply(temp);
+                let intersection_normal_temp = intersection.normal.multiply(temp);
 
                 'lights: for light in &scene.lights {
-                    let dist = light.position.subtract(&intersection_position);
-                    if intersection_normal.dot(&dist) <= 0.0 { continue }
+                    let dist = light.position.subtract(&intersection.position);
+                    if intersection.normal.dot(&dist) <= 0.0 { continue }
 
                     t = dist.dot(&dist).sqrt();
                     if t <= 0.0 { continue }
 
                     let light_ray = Ray {
-                        position: Vector { x: intersection_position.x, y: intersection_position.y, z: intersection_position.z},
-                        direction: dist.multiply(1.0/t)
+                        position: intersection.position.clone(),
+                        direction: dist.multiply(t).normalized()
                     };
 
                     // Detect Shadows
@@ -72,16 +69,16 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                     //     }
                     // }
 
-                    lambert(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_obj.unwrap().material, coef);
-                    phong(&mut pixel, &ray, &light_ray, &light, &intersection_normal, &current_obj.unwrap().material, coef);
+                    lambert(&mut pixel, &ray, &light_ray, &light, &intersection.normal, &current_obj.unwrap().material, coef);
+                    phong(&mut pixel, &ray, &light_ray, &light, &intersection.normal, &current_obj.unwrap().material, coef);
                }
 
                 // Reflections
                 coef = coef * current_obj.unwrap().material.reflection;
-                let reflection = 2.0 * ray.direction.dot(&intersection_normal);
+                let reflection = 2.0 * ray.direction.dot(&intersection_normal_temp);
 
-                ray.position = intersection_position;
-                ray.direction = ray.direction.subtract(&intersection_normal.multiply(reflection));
+                ray.position = intersection.position.clone();
+                ray.direction = ray.direction.subtract(&intersection.normal.multiply(reflection));
 
                 level = level + 1;
 
