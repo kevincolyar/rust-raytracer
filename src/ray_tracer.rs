@@ -4,6 +4,7 @@ use crate::vector::Vector;
 use crate::color::Color;
 use crate::scene::Scene;
 use crate::ray::Ray;
+use crate::object::ObjectType;
 
 use crate::shaders::lambert;
 use crate::shaders::phong;
@@ -48,7 +49,7 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                 let temp = 1.0 / temp.sqrt();
                 let intersection_normal_temp = intersection.normal.multiply(temp);
 
-                'lights: for light in &scene.lights {
+                for light in &scene.lights {
                     let dist = light.position.subtract(&intersection.position);
                     if intersection.normal.dot(&dist) <= 0.0 { continue }
 
@@ -60,14 +61,19 @@ pub fn render(scene: &Scene, img: &mut RgbImage){
                         direction: dist.multiply(t).normalized()
                     };
 
+                    let mut in_shadow = false;
                     // Detect Shadows
-                    // for obj in &scene.objects {
-                    //     let intersection = obj.intersection(&light_ray, t);
+                    for obj in scene.objects.iter()
+                        .filter(|o| matches!(o.object_type, ObjectType::Sphere)){
+                            let intersection = obj.intersection(&light_ray, t);
 
-                    //     if intersection.success {
-                    //         break 'lights;
-                    //     }
-                    // }
+                        if intersection.success {
+                            in_shadow = true;
+                            continue
+                        }
+                    }
+
+                    if in_shadow { continue }
 
                     lambert(&mut pixel, &ray, &light_ray, &light, &intersection.normal, &current_obj.unwrap().material, coef);
                     phong(&mut pixel, &ray, &light_ray, &light, &intersection.normal, &current_obj.unwrap().material, coef);

@@ -30,7 +30,7 @@ impl Object {
 
         if denom.abs() > 0.000001 {
             let tmp_t = self.position.subtract(&ray.position).dot(&self.normal) / denom;
-            if tmp_t >= 0.0000001 {
+            if tmp_t >= 0.000001 {
                 let position = ray.position.add(&ray.direction.multiply(tmp_t));
                 return Intersection { t: tmp_t, success: true, normal: self.normal.clone(), position: position }
             }
