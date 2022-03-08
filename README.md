@@ -4,5 +4,5 @@
 
 # Tasks
 
-+ [ ] Shadows
++ [X] Shadows
 + [ ] Depth of field
